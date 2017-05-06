@@ -15,10 +15,13 @@ class NSGA: public QObject{
     std::vector<std::vector<int>> fronts;
     double objectiveFunction1(const Solution& s);
     double objectiveFunction2(const Solution& s);
+    int givenPopulationSize;  //parametr zadany przez użytkownika, może się zmieniać w trakcie symulacji
     int populationSize;
+    int givenProblemSize;
     int problemSize;
 
     void clearFronts();
+    Solution crossoverAndMutate(const Solution& dominantParent, const Solution& recesiveParent);
 public:
     NSGA(QObject* parent);
     void generateRandomPopulation(const std::array<std::pair<double,double>, MAX_PROBLEM_SIZE>& range);
@@ -27,8 +30,8 @@ public:
     void createOffspring();
 
 public slots:
-    void setPopulationSize(int sz){populationSize = sz;}
-    void setProblemSize(int sz){problemSize = sz;}
+    void setPopulationSize(int sz){givenPopulationSize = sz;}
+    void setProblemSize(int sz){givenProblemSize = sz;}
 
 };
 

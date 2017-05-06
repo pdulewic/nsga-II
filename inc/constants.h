@@ -15,4 +15,10 @@ const int MAX_X_RANGE = 10000;
 const int MAIN_WINDOW_WIDTH = 640;
 const int MAIN_WINDOW_HEIGHT = 480;
 
+// przewaga dominującego rodzica przy przekazywaniu genów
+const double DOMINANT_PARENT_ADVANTAGE = 0.8;  // 80%
+const double MUTATION_PROBABILITY = 0.3;
+// maksymalny procent, o jaki mogą się zmienić elementy rozwiązania przy mutacji
+const double MUTATION_STRENGTH = 0.4;
+
 #endif // CONSTANTS_H

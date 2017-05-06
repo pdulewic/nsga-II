@@ -13,3 +13,20 @@ bool Solution::dominates(const Solution &s){
 }
 
 
+bool operator<(const Solution &s1, const Solution &s2){
+    if(s1.nondominationRank > s2.nondominationRank)
+        return true;
+    if(s1.nondominationRank < s2.nondominationRank)
+        return false;
+    return s1.crowdingDistance < s2.crowdingDistance;
+}
+
+bool operator>(const Solution &s1, const Solution &s2){
+    if(s1.nondominationRank < s2.nondominationRank)
+        return true;
+    if(s1.nondominationRank > s2.nondominationRank)
+        return false;
+    return s1.crowdingDistance > s2.crowdingDistance;
+}
+
+

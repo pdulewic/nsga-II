@@ -14,6 +14,7 @@ void MainWindow::displayParetoFront(){
     QVector<double> x, y;
     nsga->getParetoFrontCoordinates(x,y);
     plot->graph(0)->setData(x,y);
+    // todo: ustawić lepszy dobór zakresu plota
     plot->xAxis->setRange(-1, 100);
     plot->yAxis->setRange(-1,100);
     plot->replot();
@@ -26,6 +27,8 @@ void MainWindow::openRangeDialog(){
 
 void MainWindow::start(){
     nsga->generateRandomPopulation(solutionRange);
+    nsga->fastNondominatedSort();
+    nsga->createOffspring();
     nsga->fastNondominatedSort();
     displayParetoFront();
 }
@@ -51,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     plot->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     plot->addGraph();
     plot->graph(0)->setLineStyle(QCPGraph::lsNone);
-    plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPeace,5));
+    plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle,5));
     plot->xAxis->setLabel("f1");
     plot->yAxis->setLabel("f2");
 
