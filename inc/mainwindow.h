@@ -10,6 +10,7 @@ class QCustomPlot;
 class QSpinBox;
 class QPushButton;
 class NSGA;
+class QLabel;
 
 class MainWindow : public QMainWindow
 {
@@ -22,12 +23,15 @@ class MainWindow : public QMainWindow
     QCustomPlot* plot;
     QSpinBox* populationSize;
     QSpinBox* problemSize;
+    QSpinBox* generationBox;
     QPushButton* startButton;
     QPushButton* rangeDialogButton;
+    QLabel* generationCounter;
 
     void displayParetoFront();
 
 private slots:
+    void setNumberOfGenerations(int val){numberOfGenerations = val; }
     void openRangeDialog();
     void start();
 
