@@ -17,6 +17,7 @@ class MainWindow : public QMainWindow
 
     NSGA* nsga;
     std::array<std::pair<double,double>, MAX_PROBLEM_SIZE> solutionRange;  // zakres dozwolonych wartości zmiennych rozwiązania x
+    int numberOfGenerations;
 
     QCustomPlot* plot;
     QSpinBox* populationSize;

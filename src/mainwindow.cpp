@@ -28,12 +28,15 @@ void MainWindow::openRangeDialog(){
 void MainWindow::start(){
     nsga->generateRandomPopulation(solutionRange);
     nsga->fastNondominatedSort();
-    nsga->createOffspring();
-    nsga->fastNondominatedSort();
-    displayParetoFront();
+    for(int i=0; i<numberOfGenerations; ++i){
+        nsga->createOffspring();
+        nsga->fastNondominatedSort();
+        nsga->cutUnfitHalf();
+        displayParetoFront();
+    }
 }
 
-MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGenerations(DEFAULT_GENERATIONS){
     nsga = new NSGA(this);
 
     populationSize = new QSpinBox;

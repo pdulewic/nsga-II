@@ -21,6 +21,8 @@ class NSGA: public QObject{
     int problemSize;
 
     void clearFronts();
+    void crowdingDistanceAssignment(const std::vector<int>& frontIndex);
+
     Solution crossoverAndMutate(const Solution& dominantParent, const Solution& recesiveParent);
 public:
     NSGA(QObject* parent);
@@ -28,6 +30,7 @@ public:
     void getParetoFrontCoordinates(QVector<double>& f1, QVector<double>& f2);
     void fastNondominatedSort();
     void createOffspring();
+    void cutUnfitHalf();
 
 public slots:
     void setPopulationSize(int sz){givenPopulationSize = sz;}

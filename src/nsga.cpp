@@ -24,6 +24,34 @@ void NSGA::clearFronts(){
     fronts.clear();
 }
 
+void NSGA::crowdingDistanceAssignment(const std::vector<int> &frontIndex){
+    vector<Solution*> front;
+
+    for(const auto x:frontIndex){
+        front.push_back(&population[x]);
+        front.back()->crowdingDistance = 0;
+    }
+
+    // posortuj front Pareto od najmniejszej wartości pierwszej funkcji celu, do największej
+    sort(front.begin(), front.end(), [](Solution* a,Solution* b){return a->objValue1 < b->objValue1;} );
+    // skrajne wartości otrzymują bardzo duży wskaźnik crowdingDistance (ale nie maksymalną
+    // wartość typu double, bo mogą jeszcze wzrosnąć w kolejnym kroku)
+    front.front()->crowdingDistance = front.back()->crowdingDistance = BIG_DOUBLE;
+    double deltaF = front.back()->objValue1 - front.front()->objValue1;
+    for(auto i = front.begin()+1; i<front.end()-1; ++i){
+        (*i)->crowdingDistance += ((*(i+1))->objValue1 - (*(i-1))->objValue1)/deltaF;
+    }
+
+    // to samo, tylko względem drugiej funkcji celu
+    sort(front.begin(), front.end(), [](Solution* a,Solution* b){return a->objValue2 < b->objValue2;} );
+    front.front()->crowdingDistance = front.back()->crowdingDistance = BIG_DOUBLE;
+    deltaF = front.back()->objValue2 - front.front()->objValue2;
+    for(auto i = front.begin()+1; i<front.end()-1; ++i){
+        (*i)->crowdingDistance += ((*(i+1))->objValue2 - (*(i-1))->objValue2)/deltaF;
+    }
+}
+
+
 Solution NSGA::crossoverAndMutate(const Solution &dominantParent, const Solution &recesiveParent){
     Solution child(problemSize);
     for(int i=0; i<problemSize; ++i){
@@ -76,7 +104,7 @@ void NSGA::getParetoFrontCoordinates(QVector<double> &f1, QVector<double> &f2){
 
 void NSGA::fastNondominatedSort(){
     clearFronts();                    //powstaną nowe fronty pareto
-    int currentPopulationSize = population.size();
+    int currentPopulationSize = population.size();   //populacja może być powiększona o potomstwo
     fronts.push_back(vector<int>(0)); //pierwszy front
     vector<int> n(currentPopulationSize);    //licznik elementów dominujących każde rozwiązanie
     fill(n.begin(),n.end(),0);
@@ -124,14 +152,29 @@ void NSGA::createOffspring(){
     for(int i=0; i<matesSize; i+=4){
         if(i+3 >= matesSize)
             break;
-        int parent1 = population[mates[i]] > population[mates[i+1]] ? mates[i] : mates[i+1];
-        int parent2 = population[mates[i+2]] > population[mates[i+3]] ? mates[i+2] : mates[i+3];
+        int parent1 = population[mates[i]] < population[mates[i+1]] ? mates[i] : mates[i+1];
+        int parent2 = population[mates[i+2]] < population[mates[i+3]] ? mates[i+2] : mates[i+3];
         // każda para ma 2 dzieci, każde ma innego rodzica dominującego
         offspring.push_back(crossoverAndMutate(population[parent1],population[parent2]));
         offspring.push_back(crossoverAndMutate(population[parent2],population[parent1]));
     }
     // dołączenie potomstwa do populacji
     population.insert(population.end(),make_move_iterator(offspring.begin()),make_move_iterator(offspring.end()));
+}
+
+void NSGA::cutUnfitHalf(){
+    int numberOfAccepted = 0; //liczba zaakceprowanych do tej pory rozwiązań
+    int i=0;
+    while(numberOfAccepted + static_cast<int>(fronts[i].size()) <= populationSize){
+        crowdingDistanceAssignment(fronts[i]);
+        numberOfAccepted += fronts[i].size();
+        i++;
+    }
+    int freePlaces = populationSize - numberOfAccepted;
+    if(freePlaces)
+        crowdingDistanceAssignment(fronts[i]);
+    sort(population.begin(), population.end());  // o wypadkowej jakości decyduje crowded comparsion operator
+    population.erase(population.begin()+populationSize, population.end()); // survival of the fittest
 }
 
 NSGA::NSGA(QObject *parent = nullptr): QObject(parent){
