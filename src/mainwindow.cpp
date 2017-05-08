@@ -2,7 +2,6 @@
 #include "inc/qcustomplot.h"
 #include "inc/nsga.h"
 #include "inc/range_dialog.h"
-#include <QVector>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFormLayout>
@@ -10,14 +9,26 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QDebug>
+#include <QGroupBox>
+#include <QSlider>
 
 void MainWindow::displayParetoFront(){
     QVector<double> x, y;
     nsga->getParetoFrontCoordinates(x,y);
+    xPlotData.push_back(x);
+    yPlotData.push_back(y);
     plot->graph(0)->setData(x,y);
     plot->graph(0)->rescaleAxes();
     plot->replot();
 }
+
+void MainWindow::displayScene(int time){
+    generationCounter->setText("Liczba generacji: " + QString::number(time));
+    plot->graph(0)->setData(xPlotData[time-1],yPlotData[time-1]);
+    plot->graph(0)->rescaleAxes();
+    plot->replot();
+}
+
 
 void MainWindow::openRangeDialog(){
     RangeDialog* dialog = new RangeDialog(&solutionRange,problemSize->value(),this);
@@ -25,6 +36,8 @@ void MainWindow::openRangeDialog(){
 }
 
 void MainWindow::start(){
+    xPlotData.clear();
+    yPlotData.clear();
     nsga->generateRandomPopulation(solutionRange);
     nsga->fastNondominatedSort();
 
@@ -36,6 +49,9 @@ void MainWindow::start(){
         displayParetoFront();
         generationCounter->setText("Liczba generacji: " + QString::number(i+1));
     }
+    timeSlider->setRange(1,currentNumberOfGenerations);
+    timeSlider->setValue(currentNumberOfGenerations);
+    timeSlider->setEnabled(true);
 }
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGenerations(DEFAULT_GENERATIONS){
@@ -57,6 +73,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
 
     startButton = new QPushButton("Start");
     rangeDialogButton = new QPushButton("Zakres wartości x");
+    timeSlider = new QSlider(Qt::Horizontal);
+    timeSlider->setDisabled(true);
+    timeSlider->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
 
     for(int i=0; i<MAX_PROBLEM_SIZE; ++i)
         solutionRange[i] = std::make_pair(-DEFAULT_X_RANGE,DEFAULT_X_RANGE);
@@ -76,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
     connect(generationBox,SIGNAL(valueChanged(int)),this,SLOT(setNumberOfGenerations(int)));
     connect(startButton,SIGNAL(clicked(bool)),this,SLOT(start()) );
     connect(rangeDialogButton,SIGNAL(clicked(bool)),this,SLOT(openRangeDialog()));
+    connect(timeSlider,SIGNAL(valueChanged(int)),this,SLOT(displayScene(int)));
 
     QFormLayout* paramLayout = new QFormLayout;
     paramLayout->addRow("Rozmiar populacji:",populationSize);
@@ -83,14 +103,24 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
     paramLayout->addRow("Liczba generacji:",generationBox);
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
-    rightLayout->addLayout(paramLayout);
+    QGroupBox* paramGroupBox = new QGroupBox("Parametry");
+    paramGroupBox->setLayout(paramLayout);
+    //rightLayout->addLayout(paramLayout);
+    rightLayout->addWidget(paramGroupBox);
     rightLayout->addWidget(rangeDialogButton);
     rightLayout->addWidget(startButton);
     rightLayout->addStretch();
     rightLayout->addWidget(generationCounter);
 
+    QVBoxLayout* leftLayout = new QVBoxLayout;
+    QHBoxLayout* timeLayout = new QHBoxLayout;
+    timeLayout->addWidget(new QLabel("Oś czasu"));
+    timeLayout->addWidget(timeSlider);
+    leftLayout->addWidget(plot);
+    leftLayout->addLayout(timeLayout);
+
     QHBoxLayout* layout = new QHBoxLayout;
-    layout->addWidget(plot);
+    layout->addLayout(leftLayout);
     layout->addLayout(rightLayout);
 
     QWidget* widget = new QWidget;

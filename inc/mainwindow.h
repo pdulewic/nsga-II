@@ -4,13 +4,16 @@
 #include <QMainWindow>
 #include "constants.h"
 #include <array>
+#include <vector>
 #include <utility>
+#include <QVector>
 
 class QCustomPlot;
 class QSpinBox;
 class QPushButton;
 class NSGA;
 class QLabel;
+class QSlider;
 
 class MainWindow : public QMainWindow
 {
@@ -18,6 +21,9 @@ class MainWindow : public QMainWindow
 
     NSGA* nsga;
     std::array<std::pair<double,double>, MAX_PROBLEM_SIZE> solutionRange;  // zakres dozwolonych wartości zmiennych rozwiązania x
+    // wektory klasy QVector są danymi wejściowymi funkcji setData klasy QCPGraph, stąd ich wymieszanie z std::vector
+    std::vector<QVector<double>> xPlotData;
+    std::vector<QVector<double>> yPlotData;
     int numberOfGenerations;
 
     QCustomPlot* plot;
@@ -27,11 +33,12 @@ class MainWindow : public QMainWindow
     QPushButton* startButton;
     QPushButton* rangeDialogButton;
     QLabel* generationCounter;
+    QSlider* timeSlider;
 
     void displayParetoFront();
-
 private slots:
     void setNumberOfGenerations(int val){numberOfGenerations = val; }
+    void displayScene(int time);
     void openRangeDialog();
     void start();
 

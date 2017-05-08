@@ -5,13 +5,18 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QMessageBox>
 
 void RangeDialog::save(){
     for(int i=0; i<size; ++i){
         if(minRanges[i]->value() < maxRanges[i]->value())
             range->at(i) = std::make_pair(minRanges[i]->value(),maxRanges[i]->value());
-        else
-            ;  //todo: wywalić tu okienko dialogowe z informacją o błędzie
+        else{
+            QMessageBox errorBox(QMessageBox::Warning, "Uwaga!", "Minimalna wartość zmiennej x" +
+                                 QString::number(i+1) + " jest większa lub równa wartości maksymalnej", 0, this);
+            errorBox.exec();
+            return;
+        }
     }
     close();
 }
