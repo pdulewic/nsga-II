@@ -17,7 +17,7 @@ struct Solution{
     bool dominates(const Solution& s);
 };
 
-// crowded comparsion operator - mniejszy == lepszy
+// crowded comparsion operator - mniejszy == lepszy (porównuje ogólną jakość rozwiązań)
 bool operator< (const Solution& s1, const Solution& s2);
 bool operator> (const Solution& s1, const Solution& s2);
 

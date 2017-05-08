@@ -10,12 +10,20 @@ using namespace std;
 
 double NSGA::objectiveFunction1(const Solution &s){
     // tutaj trzeba zaimplementować możliwość dowolnej funkcji z parsera
-    return pow(s.val[0],2.0);
+    double value = 0;
+    for(int i=0; i<problemSize-1; ++i){
+        value += -10.0 * exp(-0.2 * sqrt(pow(s.val[i],2.0) + pow(s.val[i+1],2.0) ));
+    }
+    return value;
 }
 
 double NSGA::objectiveFunction2(const Solution &s){
     // tutaj trzeba zaimplementować możliwość dowolnej funkcji z parsera
-    return pow(s.val[0]-2.0,2.0);
+    double value = 0;
+    for(int i=0; i<problemSize; ++i){
+        value += pow(abs(s.val[i]), 0.8) + 5*sin(pow(s.val[i],3.0));
+    }
+    return value;
 }
 
 void NSGA::clearFronts(){
@@ -96,9 +104,11 @@ void NSGA::generateRandomPopulation(const array<pair<double, double>, MAX_PROBLE
 }
 
 void NSGA::getParetoFrontCoordinates(QVector<double> &f1, QVector<double> &f2){
-    for(const auto &x : fronts[0]){   //zamienić tutaj potem populację na pareto front
-        f1.push_back(population[x].objValue1);
-        f2.push_back(population[x].objValue2);
+    for(const auto &x : population){
+        if(x.nondominationRank == 1){
+            f1.push_back(x.objValue1);
+            f2.push_back(x.objValue2);
+        }
     }
 }
 
@@ -174,6 +184,8 @@ void NSGA::cutUnfitHalf(){
     if(freePlaces)
         crowdingDistanceAssignment(fronts[i]);
     sort(population.begin(), population.end());  // o wypadkowej jakości decyduje crowded comparsion operator
+    // po powyższej operacji wektor fronts znajduje się w nieprawidłowym stanie do kolejnego
+    // wywołania funkcji fastNondominatedSort
     population.erase(population.begin()+populationSize, population.end()); // survival of the fittest
 }
 
