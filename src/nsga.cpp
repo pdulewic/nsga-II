@@ -1,6 +1,8 @@
 #include "inc/nsga.h"
 #include "inc/constants.h"
+#include "inc/exprtk.h"
 #include <QDebug>
+#include <QString>
 #include <random>
 #include <cmath>
 #include <algorithm>
@@ -8,28 +10,12 @@
 
 using namespace std;
 
-double NSGA::objectiveFunction1(const Solution &s){
-    // tutaj trzeba zaimplementować możliwość dowolnej funkcji z parsera
-    double value = 0;
-    for(int i=0; i<problemSize-1; ++i){
-        value += -10.0 * exp(-0.2 * sqrt(pow(s.val[i],2.0) + pow(s.val[i+1],2.0) ));
-    }
-    return value;
-}
-
-double NSGA::objectiveFunction2(const Solution &s){
-    // tutaj trzeba zaimplementować możliwość dowolnej funkcji z parsera
-    double value = 0;
-    for(int i=0; i<problemSize; ++i){
-        value += pow(abs(s.val[i]), 0.8) + 5*sin(pow(s.val[i],3.0));
-    }
-    return value;
-}
-
-void NSGA::clearFronts(){
-    for(auto x:fronts)
-        x.clear();
-    fronts.clear();
+void NSGA::evaluateObjectiveFunctions(Solution &s){
+    // todo: dodać więcej gotowych, bardziej skomplikowanych funkcji do wyboru.
+    for(uint i = 0; i<arguments.size(); ++i)
+        arguments[i] = s.val[i];
+    s.objValue1 = expression1->value();
+    s.objValue2 = expression2->value();
 }
 
 void NSGA::crowdingDistanceAssignment(const std::vector<int> &frontIndex){
@@ -75,15 +61,12 @@ Solution NSGA::crossoverAndMutate(const Solution &dominantParent, const Solution
         for(int i=0; i<problemSize; ++i)
             child.val[i] += child.val[i]*strength(e);
     }
-    child.objValue1 = objectiveFunction1(child);
-    child.objValue2 = objectiveFunction2(child);
+    evaluateObjectiveFunctions(child);
     return child;
 }
 
 void NSGA::generateRandomPopulation(const array<pair<double, double>, MAX_PROBLEM_SIZE> &range){
     population.clear();
-    populationSize = givenPopulationSize;  //ustalenie parametru na czas całej symulacji
-    problemSize = givenProblemSize;
 
     random_device r;
     default_random_engine e(r());
@@ -96,8 +79,7 @@ void NSGA::generateRandomPopulation(const array<pair<double, double>, MAX_PROBLE
         Solution s(problemSize);
         for(int j=0; j<problemSize; ++j)
             s.val[j] = dist[j](e);   // przydział losowych wartości z ustawionych przedziałów
-        s.objValue1 = objectiveFunction1(s);
-        s.objValue2 = objectiveFunction2(s);
+        evaluateObjectiveFunctions(s);
         population.push_back(s);
     }
 
@@ -113,7 +95,7 @@ void NSGA::getParetoFrontCoordinates(QVector<double> &f1, QVector<double> &f2){
 }
 
 void NSGA::fastNondominatedSort(){
-    clearFronts();                    //powstaną nowe fronty pareto
+    fronts.clear();                    //powstaną nowe fronty pareto
     int currentPopulationSize = population.size();   //populacja może być powiększona o potomstwo
     fronts.push_back(vector<int>(0)); //pierwszy front
     vector<int> n(currentPopulationSize);    //licznik elementów dominujących każde rozwiązanie
@@ -189,7 +171,31 @@ void NSGA::cutUnfitHalf(){
     population.erase(population.begin()+populationSize, population.end()); // survival of the fittest
 }
 
-NSGA::NSGA(QObject *parent = nullptr): QObject(parent){
+void NSGA::initializeObjectiveFunctions(string exp1, string exp2){
+    populationSize = givenPopulationSize;  //ustalenie parametru na czas całej symulacji
+    problemSize = givenProblemSize;
+
+    exprtk::parser<double> parser;
+    arguments = vector<double>(problemSize);
+    exprtk::symbol_table<double> symbolTable;
+    for(int i = 0; i<problemSize; ++i){
+        QString tmp = "x" + QString::number(i+1);
+        symbolTable.add_variable(tmp.toStdString(),arguments[i]);
+    }
+
+    delete expression1;
+    expression1 = new exprtk::expression<double>;
+    expression1->register_symbol_table(symbolTable);
+    parser.compile(exp1,*expression1);
+
+    delete expression2;
+    expression2 = new exprtk::expression<double>;
+    expression2->register_symbol_table(symbolTable);
+    parser.compile(exp2,*expression2);
+}
+
+NSGA::NSGA(QObject *parent = nullptr): QObject(parent),
+    expression1(nullptr), expression2(nullptr){
     givenPopulationSize = DEFAULT_POPULATION_SIZE;
     givenProblemSize = MIN_PROBLEM_SIZE;
 }

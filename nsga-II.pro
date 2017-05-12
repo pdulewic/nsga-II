@@ -36,4 +36,5 @@ HEADERS  += inc/mainwindow.h \
     inc/solution.h \
     inc/nsga.h \
     inc/constants.h \
-    inc/range_dialog.h
+    inc/range_dialog.h \
+    inc/exprtk.h

@@ -14,6 +14,7 @@ class QPushButton;
 class NSGA;
 class QLabel;
 class QSlider;
+class QLineEdit;
 
 class MainWindow : public QMainWindow
 {
@@ -34,6 +35,8 @@ class MainWindow : public QMainWindow
     QPushButton* rangeDialogButton;
     QLabel* generationCounter;
     QSlider* timeSlider;
+    QLineEdit* expression1;
+    QLineEdit* expression2;
 
     void displayParetoFront();
 private slots:

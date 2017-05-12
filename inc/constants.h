@@ -19,6 +19,8 @@ const int MAX_GENERATIONS = 1000;
 const int MAIN_WINDOW_WIDTH = 1000;
 const int MAIN_WINDOW_HEIGHT = 700;
 
+const int FUNCTION_INPUT_WIDTH = 200;
+
 // przewaga dominującego rodzica przy przekazywaniu genów
 const double DOMINANT_PARENT_ADVANTAGE = 0.8;  // 80%
 const double MUTATION_PROBABILITY = 0.3;

@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QGroupBox>
 #include <QSlider>
+#include <QLineEdit>
 
 void MainWindow::displayParetoFront(){
     QVector<double> x, y;
@@ -38,6 +39,8 @@ void MainWindow::openRangeDialog(){
 void MainWindow::start(){
     xPlotData.clear();
     yPlotData.clear();
+    nsga->initializeObjectiveFunctions(expression1->text().toStdString(),
+                                       expression2->text().toStdString());
     nsga->generateRandomPopulation(solutionRange);
     nsga->fastNondominatedSort();
 
@@ -77,6 +80,13 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
     timeSlider->setDisabled(true);
     timeSlider->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
 
+    expression1 = new QLineEdit;
+    expression1->setFixedWidth(FUNCTION_INPUT_WIDTH);
+    expression1->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+    expression2 = new QLineEdit;
+    expression2->setFixedWidth(FUNCTION_INPUT_WIDTH);
+    expression2->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+
     for(int i=0; i<MAX_PROBLEM_SIZE; ++i)
         solutionRange[i] = std::make_pair(-DEFAULT_X_RANGE,DEFAULT_X_RANGE);
 
@@ -102,11 +112,19 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
     paramLayout->addRow("Wymiar problemu:",problemSize);
     paramLayout->addRow("Liczba generacji:",generationBox);
 
+    QGroupBox* objectiveGroupBox = new QGroupBox("Funkcje celu");
+    QVBoxLayout* objectiveLayout = new QVBoxLayout;
+    QFormLayout* expr1Layout = new QFormLayout;
+    expr1Layout->addRow("f1(x) = ", expression1);
+    expr1Layout->addRow("f2(x) = ", expression2);
+    objectiveLayout->addLayout(expr1Layout);
+    objectiveGroupBox->setLayout(objectiveLayout);
+
     QVBoxLayout* rightLayout = new QVBoxLayout;
     QGroupBox* paramGroupBox = new QGroupBox("Parametry");
     paramGroupBox->setLayout(paramLayout);
-    //rightLayout->addLayout(paramLayout);
     rightLayout->addWidget(paramGroupBox);
+    rightLayout->addWidget(objectiveGroupBox);
     rightLayout->addWidget(rangeDialogButton);
     rightLayout->addWidget(startButton);
     rightLayout->addStretch();
