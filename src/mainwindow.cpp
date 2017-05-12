@@ -2,6 +2,7 @@
 #include "inc/qcustomplot.h"
 #include "inc/nsga.h"
 #include "inc/range_dialog.h"
+#include "inc/pareto_dialog.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFormLayout>
@@ -33,6 +34,12 @@ void MainWindow::displayScene(int time){
 
 void MainWindow::openRangeDialog(){
     RangeDialog* dialog = new RangeDialog(&solutionRange,problemSize->value(),this);
+    dialog->show();
+}
+
+void MainWindow::openTableDialog(){
+    ParetoDialog* dialog = new ParetoDialog;
+    dialog->setTable(nsga->getParetoFront());
     dialog->show();
 }
 
@@ -76,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
 
     startButton = new QPushButton("Start");
     rangeDialogButton = new QPushButton("Zakres wartości x");
+    paretoDialogButton = new QPushButton("Tabela rozwiązań Pareto");
     timeSlider = new QSlider(Qt::Horizontal);
     timeSlider->setDisabled(true);
     timeSlider->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
@@ -105,6 +113,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
     connect(generationBox,SIGNAL(valueChanged(int)),this,SLOT(setNumberOfGenerations(int)));
     connect(startButton,SIGNAL(clicked(bool)),this,SLOT(start()) );
     connect(rangeDialogButton,SIGNAL(clicked(bool)),this,SLOT(openRangeDialog()));
+    connect(paretoDialogButton,SIGNAL(clicked(bool)),this,SLOT(openTableDialog()));
     connect(timeSlider,SIGNAL(valueChanged(int)),this,SLOT(displayScene(int)));
 
     QFormLayout* paramLayout = new QFormLayout;
@@ -126,6 +135,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
     rightLayout->addWidget(paramGroupBox);
     rightLayout->addWidget(objectiveGroupBox);
     rightLayout->addWidget(rangeDialogButton);
+    rightLayout->addWidget(paretoDialogButton);
     rightLayout->addWidget(startButton);
     rightLayout->addStretch();
     rightLayout->addWidget(generationCounter);

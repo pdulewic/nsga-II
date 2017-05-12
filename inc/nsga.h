@@ -35,6 +35,7 @@ public:
     NSGA(QObject* parent);
     void generateRandomPopulation(const std::array<std::pair<double,double>, MAX_PROBLEM_SIZE>& range);
     void getParetoFrontCoordinates(QVector<double>& f1, QVector<double>& f2);
+    std::vector<Solution> getParetoFront();
     void fastNondominatedSort();
     void createOffspring();
     void cutUnfitHalf();

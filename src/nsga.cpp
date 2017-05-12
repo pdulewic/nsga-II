@@ -94,6 +94,15 @@ void NSGA::getParetoFrontCoordinates(QVector<double> &f1, QVector<double> &f2){
     }
 }
 
+std::vector<Solution> NSGA::getParetoFront(){
+    std::vector<Solution> front;
+    for(auto x : population){
+        if(x.nondominationRank == 1)
+            front.push_back(x);
+    }
+    return front;
+}
+
 void NSGA::fastNondominatedSort(){
     fronts.clear();                    //powstaną nowe fronty pareto
     int currentPopulationSize = population.size();   //populacja może być powiększona o potomstwo

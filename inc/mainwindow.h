@@ -16,6 +16,7 @@ class QLabel;
 class QSlider;
 class QLineEdit;
 
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -33,6 +34,7 @@ class MainWindow : public QMainWindow
     QSpinBox* generationBox;
     QPushButton* startButton;
     QPushButton* rangeDialogButton;
+    QPushButton* paretoDialogButton;
     QLabel* generationCounter;
     QSlider* timeSlider;
     QLineEdit* expression1;
@@ -43,6 +45,7 @@ private slots:
     void setNumberOfGenerations(int val){numberOfGenerations = val; }
     void displayScene(int time);
     void openRangeDialog();
+    void openTableDialog();
     void start();
 
 protected:

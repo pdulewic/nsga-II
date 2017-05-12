@@ -29,7 +29,9 @@ SOURCES += \
     src/qcustomplot.cpp \
     src/solution.cpp \
     src/nsga.cpp \
-    src/range_dialog.cpp
+    src/range_dialog.cpp \
+    src/pareto_table.cpp \
+    src/pareto_dialog.cpp
 
 HEADERS  += inc/mainwindow.h \
     inc/qcustomplot.h \
@@ -37,4 +39,6 @@ HEADERS  += inc/mainwindow.h \
     inc/nsga.h \
     inc/constants.h \
     inc/range_dialog.h \
-    inc/exprtk.h
+    inc/exprtk.h \
+    inc/pareto_table.h \
+    inc/pareto_dialog.h
