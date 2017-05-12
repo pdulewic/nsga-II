@@ -1,2 +1,8 @@
 build*/ 
 .directory
+doc/*aux
+doc/*pdf
+doc/*out
+doc/*log
+doc/*gz
+

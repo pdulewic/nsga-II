@@ -1,0 +1,64 @@
+\documentclass[11pt,a4paper]{article}
+ 
+%-----------MATEMATYKA----------------------------------------
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%-------------------------------------------------------------
+
+%\usepackage{multiline}
+\usepackage{changepage}
+\usepackage{geometry}
+\newgeometry{tmargin=2.5cm, bmargin=3.5cm, lmargin=3.5cm, rmargin=3.5cm}
+
+\usepackage{indentfirst}
+\usepackage{graphicx} 	
+\usepackage{float}
+\usepackage[utf8]{inputenc} 
+\usepackage[english,polish]{babel}
+\usepackage{polski}
+
+%------------ HYPERREF----------------------------------------
+\usepackage{hyperref}
+% tu można dodać \usepackage{caption} dla figure gez caption
+\usepackage[all]{hypcap} % odnośniki do góry figure
+
+\usepackage{xcolor}  
+\hypersetup{         %stylowe hyperrefy zamiast czerwonych ramek
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+%-------------------------------------------------------------
+
+
+\title{Teoria optymalizacji - sprawozdanie z projektu}
+\author{Piotr Dulewicz 209253 \\ Konrad Pleban numerindeksu \\ Termin zajęć: poniedziałek parzysty 11:15 \(-\) 13:00}
+\date{}
+
+\begin{document}
+\maketitle
+\section{Sformułowanie zadania optymalizacji}
+sample text
+
+\section{Omówienie algorytmu optymalizacji}
+sample text
+
+\section{Informacje o programie}
+Program został napisany w języku C++, z użyciem biblioteki graficznej Qt, w środowisku Qt Creator. Do wizualizacji zbioru Pareto w przestrzeni funkcyjnej użyta została klasa QCustomPlot. Jej autorem jest Emanuel Eichhammer. Narzędzie to udostępnione jest na licencji GNU GPL pod adresem \url{http://www.qcustomplot.com/index.php/}. Do interpretacji wyrażeń matematycznych skorzystano z biblioteki \textit{C++ Mathematical Expression Toolkit}. Jej autorem jest Arash Partow. Biblioteka jest dostępna na licencji MIT pod adresem 
+\url{http://partow.net/programming/exprtk/index.html}. 
+
+\section{Wprowadzanie danych początkowych}
+sample text
+
+\section{Przykłady testowe}
+sample text
+
+\begin{thebibliography}{9}
+\bibitem{pa} K. Deb and A. Pratap and S. Agarwal and T. Meyarivan:
+\emph{A Fast and Elitist Multiobjective Genetic Algorithm: NSGA–II},
+IEEE Transactions on Evolutionary Computation, 2002
+\end{thebibliography}
+
+\end{document}
