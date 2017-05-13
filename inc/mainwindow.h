@@ -58,7 +58,7 @@ private slots:
     void start();
     void disableExpression1(int x);
     void disableExpression2(int x);
-
+    void adjustProblemSize();
 protected:
     QSize sizeHint() const {return QSize(MAIN_WINDOW_WIDTH,MAIN_WINDOW_HEIGHT); }
 

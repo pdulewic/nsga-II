@@ -3,6 +3,7 @@
 #include "inc/exprtk.h"
 #include <QDebug>
 #include <QString>
+#include <QMessageBox>
 #include <random>
 #include <cmath>
 #include <algorithm>
@@ -12,17 +13,16 @@ using namespace std;
 
 void NSGA::evaluateObjectiveFunctions(Solution &s){
     if(isTestFunctionActivated){
-        // dodać obsługę błędów niezgodności funkcji i problemSize
         double val1 = 0, val2 = 0;
         switch (testFunctionType) {
         case TestType::BINH_KORN:
             s.objValue1 = 4.0 * pow(s.val[0],2.0) + 4.0 * pow(s.val[1],2.0);
             s.objValue2 = pow(s.val[0] - 5.0,2.0) + pow(s.val[1] - 5.0,2.0);
             break;
-        case TestType::CHAKONG_HAIMES:
+        /*case TestType::CHAKONG_HAIMES:
             s.objValue1 = 2.0 + pow(s.val[0] - 2.0,2.0) + pow(s.val[1] - 1.0,2.0);
             s.objValue2 = 9.0 * s.val[0] - pow(s.val[1] - 1.0,2.0);
-            break;
+            break;*/
         case TestType::FONSECA_FLEMING:
             for(int i=0; i<problemSize; ++i){
                 val1 += pow(s.val[i] - 1.0/sqrt(static_cast<double>(problemSize)),2.0);
@@ -31,6 +31,21 @@ void NSGA::evaluateObjectiveFunctions(Solution &s){
             s.objValue1 = 1.0 - exp(-val1);
             s.objValue2 = 1.0 - exp(-val2);
             break;
+        case TestType::KURSAWE:
+            s.objValue1 = 0;
+            s.objValue2 = 0;
+            for(int i=0; i<problemSize-1; ++i)
+                s.objValue1 += -10.0 * exp(-0.2 * sqrt(pow(s.val[i],2.0) + pow(s.val[i+1],2.0) ));
+            for(int i=0; i<problemSize; ++i)
+                s.objValue2 += pow(abs(s.val[i]), 0.8) + 5*sin(pow(s.val[i],3.0));
+            break;
+        /*case TestType::OSYCZKA_KUNDU:
+            s.objValue1 = -25.0 * pow(s.val[0] - 2.0,2.0) - pow(s.val[1] - 2.0,2.0) - pow(s.val[2] - 1.0,2.0)
+                    - pow(s.val[3] - 4.0,2.0) - pow(s.val[4] - 1.0,2.0);
+            s.objValue2 = 0;
+            for(int i=0; i<problemSize; ++i)
+                s.objValue2 += pow(s.val[i],2.0);
+            break;*/
         default:
             break;
         }
@@ -48,6 +63,23 @@ void NSGA::evaluateObjectiveFunctions(Solution &s){
             for(int i=0; i<problemSize-1; ++i)
                 s.objValue1 += 100.0 * pow((arguments[i+1] - pow(arguments[i],2.0)),2.0) + pow(arguments[i]-1.0, 2.0);
             break;
+        case FunctionType::ACKLEY:
+            s.objValue1 = -20.0 * exp(-0.2 * sqrt(0.5 * (pow(s.val[0],2.0) + pow(s.val[1],2.0))))
+                    - exp(0.5 * (cos(2.0*M_PI*s.val[0]) + cos(2.0*M_PI*s.val[1]))) + M_E + 20.0;
+            break;
+        case FunctionType::RASTRIGIN:
+            s.objValue1 = 0;
+            for(int i=0; i<problemSize; ++i)
+                s.objValue1 += pow(s.val[i],2.0) - 10.0 * cos(2.0*M_PI*s.val[i]);
+            s.objValue1 += 10.0 * problemSize;
+            break;
+        case FunctionType::GOLDSTEIN_PRICE:
+            s.objValue1 = (1.0 + pow(s.val[0] + s.val[1] + 1.0,2.0) * (19.0 - 14.0 * s.val[0] +
+                    3.0 * pow(s.val[0],2.0) - 14.0 * s.val[1] + 6.0 * s.val[0] * s.val[1] +
+                    3.0 * pow(s.val[1],2.0))) * (30.0 + pow(2.0 * s.val[0] - 3.0 * s.val[1],2.0) *
+                    (18.0 - 32.0 * s.val[0] + 12.0 * pow(s.val[0],2.0) - 48.0 * s.val[1] + 36.0 *
+                    s.val[0] * s.val[1] + 27.0 * pow(s.val[1],2.0)));
+            break;
         default:
             break;
         }
@@ -61,6 +93,23 @@ void NSGA::evaluateObjectiveFunctions(Solution &s){
             s.objValue2 = 0;
             for(int i=0; i<problemSize-1; ++i)
                 s.objValue2 += 100.0 * pow((arguments[i+1] - pow(arguments[i],2.0)),2.0) + pow(arguments[i]-1.0, 2.0);
+            break;
+        case FunctionType::ACKLEY:
+            s.objValue2 = -20.0 * exp(-0.2 * sqrt(0.5 * (pow(s.val[0],2.0) + pow(s.val[1],2.0))))
+                    - exp(0.5 * (cos(2.0*M_PI*s.val[0]) + cos(2.0*M_PI*s.val[1]))) + M_E + 20.0;
+            break;
+        case FunctionType::RASTRIGIN:
+            s.objValue2 = 0;
+            for(int i=0; i<problemSize; ++i)
+                s.objValue2 += pow(s.val[i],2.0) - 10.0 * cos(2.0*M_PI*s.val[i]);
+            s.objValue2 += 10.0 * problemSize;
+            break;
+        case FunctionType::GOLDSTEIN_PRICE:
+            s.objValue2 = (1.0 + pow(s.val[0] + s.val[1] + 1.0,2.0) * (19.0 - 14.0 * s.val[0] +
+                    3.0 * pow(s.val[0],2.0) - 14.0 * s.val[1] + 6.0 * s.val[0] * s.val[1] +
+                    3.0 * pow(s.val[1],2.0))) * (30.0 + pow(2.0 * s.val[0] - 3.0 * s.val[1],2.0) *
+                    (18.0 - 32.0 * s.val[0] + 12.0 * pow(s.val[0],2.0) - 48.0 * s.val[1] + 36.0 *
+                    s.val[0] * s.val[1] + 27.0 * pow(s.val[1],2.0)));
             break;
         default:
             break;
@@ -113,6 +162,12 @@ Solution NSGA::crossoverAndMutate(const Solution &dominantParent, const Solution
     }
     evaluateObjectiveFunctions(child);
     return child;
+}
+
+void NSGA::sizeErrorMessage(int n){
+    QMessageBox errorBox(QMessageBox::Warning, "Uwaga!", "Dla tej funkcji celu wymagany jest wymiar zadania n = "
+                         + QString::number(n), 0, nullptr);
+    errorBox.exec();
 }
 
 void NSGA::generateRandomPopulation(const array<pair<double, double>, MAX_PROBLEM_SIZE> &range){
@@ -230,27 +285,89 @@ void NSGA::cutUnfitHalf(){
     population.erase(population.begin()+populationSize, population.end()); // survival of the fittest
 }
 
-void NSGA::initializeObjectiveFunctions(string exp1, string exp2){
+bool NSGA::initializeObjectiveFunctions(string exp1, string exp2){
     populationSize = givenPopulationSize;  //ustalenie parametru na czas całej symulacji
     problemSize = givenProblemSize;
 
-    exprtk::parser<double> parser;
-    arguments = vector<double>(problemSize);
-    exprtk::symbol_table<double> symbolTable;
-    for(int i = 0; i<problemSize; ++i){
-        QString tmp = "x" + QString::number(i+1);
-        symbolTable.add_variable(tmp.toStdString(),arguments[i]);
+    if(isTestFunctionActivated){
+        switch (testFunctionType) {
+            case TestType::BINH_KORN:
+            //case TestType::CHAKONG_HAIMES:
+                if(problemSize != 2){
+                    sizeErrorMessage(2);
+                    return true;
+                }
+                break;
+            /*case TestType::OSYCZKA_KUNDU:
+                if(problemSize != 6){
+                    sizeErrorMessage(3);
+                    return true;
+                }
+            break;*/
+            default:
+                break;
+        }
     }
+    else{
+        exprtk::parser<double> parser;
+        arguments = vector<double>(problemSize);
+        exprtk::symbol_table<double> symbolTable;
+        for(int i = 0; i<problemSize; ++i){
+            QString tmp = "x" + QString::number(i+1);
+            symbolTable.add_variable(tmp.toStdString(),arguments[i]);
+        }
 
-    delete expression1;
-    expression1 = new exprtk::expression<double>;
-    expression1->register_symbol_table(symbolTable);
-    parser.compile(exp1,*expression1);
+        switch (objType1) {
+        case FunctionType::CUSTOM:
+            delete expression1;
+            expression1 = new exprtk::expression<double>;
+            expression1->register_symbol_table(symbolTable);
+            parser.compile(exp1,*expression1);
+            break;
+        case FunctionType::ACKLEY:
+        case FunctionType::GOLDSTEIN_PRICE:
+            if(problemSize != 2){
+                sizeErrorMessage(2);
+                return true;
+            }
+            break;
+        default:
+            break;
+        }
 
-    delete expression2;
-    expression2 = new exprtk::expression<double>;
-    expression2->register_symbol_table(symbolTable);
-    parser.compile(exp2,*expression2);
+        switch (objType2) {
+        case FunctionType::CUSTOM:
+            delete expression2;
+            expression2 = new exprtk::expression<double>;
+            expression2->register_symbol_table(symbolTable);
+            parser.compile(exp2,*expression2);
+            break;
+        case FunctionType::ACKLEY:
+        case FunctionType::GOLDSTEIN_PRICE:
+            if(problemSize != 2){
+                sizeErrorMessage(2);
+                return true;
+            }
+            break;
+        default:
+            break;
+        }
+
+        /*if(objType1 == FunctionType::CUSTOM){
+            delete expression1;
+            expression1 = new exprtk::expression<double>;
+            expression1->register_symbol_table(symbolTable);
+            parser.compile(exp1,*expression1);
+        }*/
+
+        /*if(objType2 == FunctionType::CUSTOM){
+            delete expression2;
+            expression2 = new exprtk::expression<double>;
+            expression2->register_symbol_table(symbolTable);
+            parser.compile(exp2,*expression2);
+        }*/
+    }
+    return false;
 }
 
 NSGA::NSGA(QObject *parent = nullptr): QObject(parent), expression1(nullptr),

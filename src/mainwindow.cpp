@@ -44,10 +44,12 @@ void MainWindow::openTableDialog(){
 }
 
 void MainWindow::start(){
+    timeSlider->setEnabled(false);
     xPlotData.clear();
     yPlotData.clear();
-    nsga->initializeObjectiveFunctions(expression1->text().toStdString(),
-                                       expression2->text().toStdString());
+    if(nsga->initializeObjectiveFunctions(expression1->text().toStdString(),
+                                       expression2->text().toStdString()))
+        return;
     nsga->generateRandomPopulation(solutionRange);
     nsga->fastNondominatedSort();
 
@@ -85,6 +87,25 @@ void MainWindow::disableExpression2(int x){
         exprLayout->labelForField(expression2)->hide();
     }
 }
+
+void MainWindow::adjustProblemSize(){
+    int type = preparedType->currentIndex();
+    switch (static_cast<TestType>(type)) {
+    case TestType::BINH_KORN:
+    //case TestType::CHAKONG_HEIMES:
+        problemSize->setValue(2);
+        break;
+    case TestType::KURSAWE:
+        problemSize->setValue(3);
+        break;
+    /*case TestType::OSYCZKA_KUNDU:
+        problemSize->setValue(6);
+        break;*/
+    default:
+        break;
+    }
+}
+
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGenerations(DEFAULT_GENERATIONS){
     setWindowTitle("Algorytm NSGA-II dla zadania dwukryterialnego");
@@ -164,6 +185,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
     connect(functionType2, SIGNAL(currentIndexChanged(int)),this,SLOT(disableExpression2(int)));
     connect(preparedFunctions,SIGNAL(toggled(bool)),nsga,SLOT(activateTestFunction(bool)));
     connect(preparedType,SIGNAL(currentIndexChanged(int)),nsga,SLOT(setTestFunctionType(int)));
+    connect(preparedType,SIGNAL(currentIndexChanged(int)),this,SLOT(adjustProblemSize()));
+    connect(preparedFunctions,SIGNAL(clicked(bool)),this, SLOT(adjustProblemSize()));
 
     QFormLayout* paramLayout = new QFormLayout;
     paramLayout->addRow("Rozmiar populacji:",populationSize);

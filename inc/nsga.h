@@ -14,13 +14,14 @@ namespace exprtk{
 }
 
 // typ wyliczeniowy określający typy funkcji celu
-enum class FunctionType {CUSTOM, ROSENBROCK, GEEM, ACKLEY, RASTRIGIN, GOLDSTEIN_PRICE};
+enum class FunctionType {CUSTOM, ROSENBROCK, ACKLEY, RASTRIGIN, GOLDSTEIN_PRICE};
 // Każdy typ musi mieć swoją nazwę, rozmiar wektora functionNames traktowany jest
 // jak liczba dostępnych typów.
-const std::vector<QString> functionNames {"Funkcja użytkownika", "Funkcja Rosenbrock'a"};
+const std::vector<QString> functionNames {"Funkcja użytkownika", "Funkcja Rosenbrock'a", "Funkcja Ackley'a", "Funkcja Rastrigina", "Funkcja Goldsteina-Price'a"};
 
-enum class TestType {BINH_KORN, CHAKONG_HAIMES, FONSECA_FLEMING};
-const std::vector<QString> testNames {"Funkcja Binh'a-Korn'a (n = 2)", "Funkcja Chakong'a-Haimes'a (n = 2)", "Funkcja Fonseca-Fleminga"};
+enum class TestType {BINH_KORN, FONSECA_FLEMING, KURSAWE};  // CHAKONG_HAIMES, OSYCZKA_KUNDU to funckje z ograniczeniami
+const std::vector<QString> testNames {"Funkcja Binh'a-Korn'a","Funkcja Fonseca-Fleminga", "Funkcja Kursawe"};
+// "Funkcja Chakong'a-Haimes'a",  "Funkcja Osyczki-Kundu"
 
 class NSGA: public QObject{
     Q_OBJECT
@@ -43,6 +44,7 @@ class NSGA: public QObject{
 
     void crowdingDistanceAssignment(const std::vector<int>& frontIndex);
     Solution crossoverAndMutate(const Solution& dominantParent, const Solution& recesiveParent);
+    void sizeErrorMessage(int n);
 public:
     NSGA(QObject* parent);
     void generateRandomPopulation(const std::array<std::pair<double,double>, MAX_PROBLEM_SIZE>& range);
@@ -51,7 +53,8 @@ public:
     void fastNondominatedSort();
     void createOffspring();
     void cutUnfitHalf();
-    void initializeObjectiveFunctions(std::string exp1, std::string exp2);
+    // false - poprawna inicjalizacja, true - błąd
+    bool initializeObjectiveFunctions(std::string exp1, std::string exp2);
 
 public slots:
     void setPopulationSize(int sz){givenPopulationSize = sz;}
