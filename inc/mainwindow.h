@@ -15,6 +15,9 @@ class NSGA;
 class QLabel;
 class QSlider;
 class QLineEdit;
+class QComboBox;
+class QFormLayout;
+class QRadioButton;
 
 
 class MainWindow : public QMainWindow
@@ -37,8 +40,14 @@ class MainWindow : public QMainWindow
     QPushButton* paretoDialogButton;
     QLabel* generationCounter;
     QSlider* timeSlider;
+    QFormLayout* exprLayout;
     QLineEdit* expression1;
     QLineEdit* expression2;
+    QComboBox* functionType1;
+    QComboBox* functionType2;
+    QComboBox* preparedType;
+    QRadioButton* customFunctions;
+    QRadioButton* preparedFunctions;
 
     void displayParetoFront();
 private slots:
@@ -47,6 +56,8 @@ private slots:
     void openRangeDialog();
     void openTableDialog();
     void start();
+    void disableExpression1(int x);
+    void disableExpression2(int x);
 
 protected:
     QSize sizeHint() const {return QSize(MAIN_WINDOW_WIDTH,MAIN_WINDOW_HEIGHT); }

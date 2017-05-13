@@ -4,8 +4,10 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QTableView>
+#include <algorithm>
 
 ParetoDialog::ParetoDialog(QWidget *parent): QDialog(parent), paretoTable(nullptr) {
+    setWindowTitle("Tabela rozwiązań Pareto");
     tableView = new QTableView;
     closeButton = new QPushButton("Zamknij");
     connect(closeButton,SIGNAL(clicked(bool)),this,SLOT(close()));
@@ -22,6 +24,7 @@ ParetoDialog::ParetoDialog(QWidget *parent): QDialog(parent), paretoTable(nullpt
 
 void ParetoDialog::setTable(std::vector<Solution> tab){
     delete paretoTable;
+    std::sort(tab.begin(),tab.end(), [](Solution a,Solution b){return a.objValue1 < b.objValue1;});
     paretoTable = new ParetoTable(tab);
     tableView->setModel(paretoTable);
     adjustSize();

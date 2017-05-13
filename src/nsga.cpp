@@ -11,11 +11,61 @@
 using namespace std;
 
 void NSGA::evaluateObjectiveFunctions(Solution &s){
-    // todo: dodać więcej gotowych, bardziej skomplikowanych funkcji do wyboru.
-    for(uint i = 0; i<arguments.size(); ++i)
-        arguments[i] = s.val[i];
-    s.objValue1 = expression1->value();
-    s.objValue2 = expression2->value();
+    if(isTestFunctionActivated){
+        // dodać obsługę błędów niezgodności funkcji i problemSize
+        double val1 = 0, val2 = 0;
+        switch (testFunctionType) {
+        case TestType::BINH_KORN:
+            s.objValue1 = 4.0 * pow(s.val[0],2.0) + 4.0 * pow(s.val[1],2.0);
+            s.objValue2 = pow(s.val[0] - 5.0,2.0) + pow(s.val[1] - 5.0,2.0);
+            break;
+        case TestType::CHAKONG_HAIMES:
+            s.objValue1 = 2.0 + pow(s.val[0] - 2.0,2.0) + pow(s.val[1] - 1.0,2.0);
+            s.objValue2 = 9.0 * s.val[0] - pow(s.val[1] - 1.0,2.0);
+            break;
+        case TestType::FONSECA_FLEMING:
+            for(int i=0; i<problemSize; ++i){
+                val1 += pow(s.val[i] - 1.0/sqrt(static_cast<double>(problemSize)),2.0);
+                val2 += pow(s.val[i] + 1.0/sqrt(static_cast<double>(problemSize)),2.0);
+            }
+            s.objValue1 = 1.0 - exp(-val1);
+            s.objValue2 = 1.0 - exp(-val2);
+            break;
+        default:
+            break;
+        }
+    }
+    else{
+        for(int i = 0; i<problemSize; ++i)
+            arguments[i] = s.val[i];
+
+        switch (objType1) {
+        case FunctionType::CUSTOM:
+            s.objValue1 = expression1->value();
+            break;
+        case FunctionType::ROSENBROCK:
+            s.objValue1 = 0;
+            for(int i=0; i<problemSize-1; ++i)
+                s.objValue1 += 100.0 * pow((arguments[i+1] - pow(arguments[i],2.0)),2.0) + pow(arguments[i]-1.0, 2.0);
+            break;
+        default:
+            break;
+        }
+
+
+        switch (objType2) {
+        case FunctionType::CUSTOM:
+            s.objValue2 = expression2->value();
+            break;
+        case FunctionType::ROSENBROCK:
+            s.objValue2 = 0;
+            for(int i=0; i<problemSize-1; ++i)
+                s.objValue2 += 100.0 * pow((arguments[i+1] - pow(arguments[i],2.0)),2.0) + pow(arguments[i]-1.0, 2.0);
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 void NSGA::crowdingDistanceAssignment(const std::vector<int> &frontIndex){
@@ -203,8 +253,9 @@ void NSGA::initializeObjectiveFunctions(string exp1, string exp2){
     parser.compile(exp2,*expression2);
 }
 
-NSGA::NSGA(QObject *parent = nullptr): QObject(parent),
-    expression1(nullptr), expression2(nullptr){
+NSGA::NSGA(QObject *parent = nullptr): QObject(parent), expression1(nullptr),
+    expression2(nullptr), objType1(FunctionType::CUSTOM), objType2(FunctionType::CUSTOM),
+    testFunctionType(TestType::BINH_KORN), isTestFunctionActivated(false){
     givenPopulationSize = DEFAULT_POPULATION_SIZE;
     givenProblemSize = MIN_PROBLEM_SIZE;
 }

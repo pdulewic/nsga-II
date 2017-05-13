@@ -64,7 +64,30 @@ void MainWindow::start(){
     timeSlider->setEnabled(true);
 }
 
+void MainWindow::disableExpression1(int x){
+    if(x == 0){
+        expression1->show();
+        exprLayout->labelForField(expression1)->show();
+    }
+    else{
+        expression1->hide();
+        exprLayout->labelForField(expression1)->hide();
+    }
+}
+
+void MainWindow::disableExpression2(int x){
+    if(x == 0){
+        expression2->show();
+        exprLayout->labelForField(expression2)->show();
+    }
+    else{
+        expression2->hide();
+        exprLayout->labelForField(expression2)->hide();
+    }
+}
+
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGenerations(DEFAULT_GENERATIONS){
+    setWindowTitle("Algorytm NSGA-II dla zadania dwukryterialnego");
     nsga = new NSGA(this);
 
     populationSize = new QSpinBox;
@@ -95,6 +118,26 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
     expression2->setFixedWidth(FUNCTION_INPUT_WIDTH);
     expression2->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
 
+    functionType1 = new QComboBox;
+    functionType1->setFixedWidth(FUNCTION_INPUT_WIDTH);
+    functionType2 = new QComboBox;
+    functionType2->setFixedWidth(FUNCTION_INPUT_WIDTH);
+    for(const auto& x : functionNames){
+        functionType1->addItem(x);
+        functionType2->addItem(x);
+    }
+    functionType1->setCurrentIndex(0);
+    functionType2->setCurrentIndex(0);
+
+    customFunctions = new QRadioButton("Wybór funkcji celu");
+    customFunctions->setChecked(true);
+    preparedFunctions = new QRadioButton("Gotowe funkcje testowe");
+    preparedType = new QComboBox;
+    //preparedType->setFixedWidth(FUNCTION_INPUT_WIDTH);
+    for(const auto& x : testNames)
+        preparedType->addItem(x);
+    preparedType->setCurrentIndex(0);
+
     for(int i=0; i<MAX_PROBLEM_SIZE; ++i)
         solutionRange[i] = std::make_pair(-DEFAULT_X_RANGE,DEFAULT_X_RANGE);
 
@@ -115,6 +158,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
     connect(rangeDialogButton,SIGNAL(clicked(bool)),this,SLOT(openRangeDialog()));
     connect(paretoDialogButton,SIGNAL(clicked(bool)),this,SLOT(openTableDialog()));
     connect(timeSlider,SIGNAL(valueChanged(int)),this,SLOT(displayScene(int)));
+    connect(functionType1, SIGNAL(currentIndexChanged(int)),nsga,SLOT(setObjType1(int)));
+    connect(functionType2, SIGNAL(currentIndexChanged(int)),nsga,SLOT(setObjType2(int)));
+    connect(functionType1, SIGNAL(currentIndexChanged(int)),this,SLOT(disableExpression1(int)));
+    connect(functionType2, SIGNAL(currentIndexChanged(int)),this,SLOT(disableExpression2(int)));
+    connect(preparedFunctions,SIGNAL(toggled(bool)),nsga,SLOT(activateTestFunction(bool)));
+    connect(preparedType,SIGNAL(currentIndexChanged(int)),nsga,SLOT(setTestFunctionType(int)));
 
     QFormLayout* paramLayout = new QFormLayout;
     paramLayout->addRow("Rozmiar populacji:",populationSize);
@@ -123,10 +172,17 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
 
     QGroupBox* objectiveGroupBox = new QGroupBox("Funkcje celu");
     QVBoxLayout* objectiveLayout = new QVBoxLayout;
-    QFormLayout* expr1Layout = new QFormLayout;
-    expr1Layout->addRow("f1(x) = ", expression1);
-    expr1Layout->addRow("f2(x) = ", expression2);
-    objectiveLayout->addLayout(expr1Layout);
+    exprLayout = new QFormLayout;
+    exprLayout->addRow("Typ f1(x)", functionType1);
+    exprLayout->addRow("f1(x) = ", expression1);
+    exprLayout->addRow("Typ f2(x)", functionType2);
+    exprLayout->addRow("f2(x) = ", expression2);
+    objectiveLayout->addWidget(customFunctions);
+    objectiveLayout->addLayout(exprLayout);
+    objectiveLayout->addWidget(preparedFunctions);
+    QFormLayout* preparedLayout = new QFormLayout;
+    preparedLayout->addRow("Typ:",preparedType);
+    objectiveLayout->addLayout(preparedLayout);
     objectiveGroupBox->setLayout(objectiveLayout);
 
     QVBoxLayout* rightLayout = new QVBoxLayout;

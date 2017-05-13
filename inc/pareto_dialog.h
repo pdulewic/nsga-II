@@ -15,7 +15,6 @@ class ParetoDialog: public QDialog{
 public:
     ParetoDialog(QWidget *parent = nullptr);
     void setTable(std::vector<Solution> tab);
-
 };
 
 #endif // PARETO_DIALOG_H
