@@ -2,12 +2,16 @@
 #define RANGE_DIALOG_H
 
 #include <QDialog>
+#include <QFont>
 #include <array>
 #include <utility>
 #include <vector>
 #include "constants.h"
 
 class QSpinBox;
+
+// czcionka do wyrażen matematycznych
+extern QFont mathFont;
 
 class RangeDialog: public QDialog{
     Q_OBJECT

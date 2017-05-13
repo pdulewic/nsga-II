@@ -18,6 +18,7 @@ class QLineEdit;
 class QComboBox;
 class QFormLayout;
 class QRadioButton;
+class QCheckBox;
 
 
 class MainWindow : public QMainWindow
@@ -48,8 +49,10 @@ class MainWindow : public QMainWindow
     QComboBox* preparedType;
     QRadioButton* customFunctions;
     QRadioButton* preparedFunctions;
+    QCheckBox* fixedScale;
 
     void displayParetoFront();
+    void createMenus();
 private slots:
     void setNumberOfGenerations(int val){numberOfGenerations = val; }
     void displayScene(int time);
@@ -59,6 +62,7 @@ private slots:
     void disableExpression1(int x);
     void disableExpression2(int x);
     void adjustProblemSize();
+    void exportAsPDF();
 protected:
     QSize sizeHint() const {return QSize(MAIN_WINDOW_WIDTH,MAIN_WINDOW_HEIGHT); }
 

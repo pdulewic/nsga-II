@@ -13,6 +13,8 @@
 #include <QGroupBox>
 #include <QSlider>
 #include <QLineEdit>
+#include <QCheckBox>
+#include <QMenu>
 
 void MainWindow::displayParetoFront(){
     QVector<double> x, y;
@@ -20,14 +22,25 @@ void MainWindow::displayParetoFront(){
     xPlotData.push_back(x);
     yPlotData.push_back(y);
     plot->graph(0)->setData(x,y);
-    plot->graph(0)->rescaleAxes();
+    if(!fixedScale->isChecked())
+        plot->graph(0)->rescaleAxes();
     plot->replot();
+}
+
+void MainWindow::createMenus(){
+    QMenu* fileMenu = menuBar()->addMenu("Eksportuj");
+
+    QAction* pdfAct = new QAction("Eksportuj jako PDF",this);
+    connect(pdfAct,SIGNAL(triggered(bool)),this,SLOT(exportAsPDF()));
+    fileMenu->addAction(pdfAct);
+
 }
 
 void MainWindow::displayScene(int time){
     generationCounter->setText("Liczba generacji: " + QString::number(time));
     plot->graph(0)->setData(xPlotData[time-1],yPlotData[time-1]);
-    plot->graph(0)->rescaleAxes();
+    if(!fixedScale->isChecked())
+        plot->graph(0)->rescaleAxes();
     plot->replot();
 }
 
@@ -106,6 +119,15 @@ void MainWindow::adjustProblemSize(){
     }
 }
 
+void MainWindow::exportAsPDF(){
+    QString filename = QFileDialog::getSaveFileName(this,"Zapisz plik jako",".","Pliki PDF (.pdf)");
+    if(filename.isEmpty())
+        return;
+    if(!filename.endsWith(".pdf"))  // Append file extension. Only .xml is allowed
+        filename.append(".pdf");
+    plot->savePdf(filename);
+}
+
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGenerations(DEFAULT_GENERATIONS){
     setWindowTitle("Algorytm NSGA-II dla zadania dwukryterialnego");
@@ -159,16 +181,22 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
         preparedType->addItem(x);
     preparedType->setCurrentIndex(0);
 
+    fixedScale = new QCheckBox("Zablokuj skalę");
+
     for(int i=0; i<MAX_PROBLEM_SIZE; ++i)
         solutionRange[i] = std::make_pair(-DEFAULT_X_RANGE,DEFAULT_X_RANGE);
 
     plot = new QCustomPlot;
     plot->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    plot->setInteraction(QCP::iRangeDrag, true);
+    plot->setInteraction(QCP::iRangeZoom, true);
     plot->addGraph();
     plot->graph(0)->setLineStyle(QCPGraph::lsNone);
-    plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle,5));
-    plot->xAxis->setLabel("f1");
-    plot->yAxis->setLabel("f2");
+    plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc,3));
+    plot->xAxis->setLabel("f1(x)");
+    plot->xAxis->setLabelFont(mathFont);
+    plot->yAxis->setLabel("f2(x)");
+    plot->yAxis->setLabelFont(mathFont);
     plot->plotLayout()->insertRow(0);
     plot->plotLayout()->addElement(0, 0, new QCPTextElement(plot, "Zbiór Pareto w przestrzeni funkcyjnej", QFont("sans", 12, QFont::Bold)));
 
@@ -221,6 +249,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
 
     QVBoxLayout* leftLayout = new QVBoxLayout;
     QHBoxLayout* timeLayout = new QHBoxLayout;
+    timeLayout->addWidget(fixedScale);
     timeLayout->addWidget(new QLabel("Oś czasu"));
     timeLayout->addWidget(timeSlider);
     leftLayout->addWidget(plot);
@@ -234,6 +263,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), numberOfGeneration
     widget->setLayout(layout);
     setCentralWidget(widget);
 
+    createMenus();
 }
 
 MainWindow::~MainWindow()

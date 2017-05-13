@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QMessageBox>
 
+QFont mathFont("times", 12, QFont::Bold, true);
+
 void RangeDialog::save(){
     for(int i=0; i<size; ++i){
         if(minRanges[i]->value() < maxRanges[i]->value())
@@ -25,7 +27,9 @@ RangeDialog::RangeDialog(std::array<std::pair<double, double>, MAX_PROBLEM_SIZE>
     setWindowTitle("Ograniczenia elementów wektora x");
     QGridLayout* layout = new QGridLayout;
     for(int i = 0; i<size; ++i){
-        layout->addWidget(new QLabel("x" + QString::number(i+1)),i,0);
+        QLabel* xLabel = new QLabel("x" + QString::number(i+1));
+        xLabel->setFont(mathFont);
+        layout->addWidget(xLabel,i,0);
 
         layout->addWidget(new QLabel("Wartość minimalna:"),i,1);
         minRanges.push_back(new QSpinBox);
