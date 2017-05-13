@@ -1,7 +1,7 @@
 build*/ 
 .directory
 doc/*aux
-doc/*pdf
+doc/sprawozdanie.pdf
 doc/*out
 doc/*log
 doc/*gz
