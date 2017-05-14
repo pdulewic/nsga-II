@@ -21,6 +21,10 @@ const int MAIN_WINDOW_HEIGHT = 700;
 
 const int FUNCTION_INPUT_WIDTH = 200;
 
+const int TABLE_BORDER_WIDTH = 80;
+const int TABLE_CELL_WIDTH = 100;
+const int TABLE_HEIGHT = 400;
+
 // przewaga dominującego rodzica przy przekazywaniu genów
 const double DOMINANT_PARENT_ADVANTAGE = 0.8;  // 80%
 const double MUTATION_PROBABILITY = 0.3;

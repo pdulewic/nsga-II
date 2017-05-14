@@ -1,5 +1,6 @@
 #include "inc/pareto_dialog.h"
 #include "inc/pareto_table.h"
+#include "inc/constants.h"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -27,5 +28,6 @@ void ParetoDialog::setTable(std::vector<Solution> tab){
     std::sort(tab.begin(),tab.end(), [](Solution a,Solution b){return a.objValue1 < b.objValue1;});
     paretoTable = new ParetoTable(tab);
     tableView->setModel(paretoTable);
-    adjustSize();
+
+    resize(TABLE_BORDER_WIDTH + (paretoTable->getProblemSize() + 2)*TABLE_CELL_WIDTH, TABLE_HEIGHT);
 }

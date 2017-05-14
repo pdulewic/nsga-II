@@ -63,6 +63,7 @@ private slots:
     void disableExpression2(int x);
     void adjustProblemSize();
     void exportAsPDF();
+    void exportAsPNG();
 protected:
     QSize sizeHint() const {return QSize(MAIN_WINDOW_WIDTH,MAIN_WINDOW_HEIGHT); }
 

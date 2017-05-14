@@ -34,6 +34,10 @@ void MainWindow::createMenus(){
     connect(pdfAct,SIGNAL(triggered(bool)),this,SLOT(exportAsPDF()));
     fileMenu->addAction(pdfAct);
 
+    QAction* pngAct = new QAction("Eksportuj jako PNG",this);
+    connect(pngAct,SIGNAL(triggered(bool)),this,SLOT(exportAsPNG()));
+    fileMenu->addAction(pngAct);
+
 }
 
 void MainWindow::displayScene(int time){
@@ -123,9 +127,18 @@ void MainWindow::exportAsPDF(){
     QString filename = QFileDialog::getSaveFileName(this,"Zapisz plik jako",".","Pliki PDF (.pdf)");
     if(filename.isEmpty())
         return;
-    if(!filename.endsWith(".pdf"))  // Append file extension. Only .xml is allowed
+    if(!filename.endsWith(".pdf"))
         filename.append(".pdf");
     plot->savePdf(filename);
+}
+
+void MainWindow::exportAsPNG(){
+    QString filename = QFileDialog::getSaveFileName(this,"Zapisz plik jako",".","Pliki PNG (.png)");
+    if(filename.isEmpty())
+        return;
+    if(!filename.endsWith(".png"))
+        filename.append(".png");
+    plot->savePng(filename);
 }
 
 
