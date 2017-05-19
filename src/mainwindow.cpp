@@ -72,7 +72,7 @@ void MainWindow::start(){
 
     int currentNumberOfGenerations = numberOfGenerations;
     for(int i=0; i<currentNumberOfGenerations; ++i){
-        nsga->createOffspring();
+        nsga->createOffspring(solutionRange);
         nsga->fastNondominatedSort();
         nsga->cutUnfitHalf();
         displayParetoFront();

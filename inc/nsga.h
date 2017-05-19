@@ -44,14 +44,16 @@ class NSGA: public QObject{
 
     void crowdingDistanceAssignment(const std::vector<int>& frontIndex);
     Solution crossoverAndMutate(const Solution& dominantParent, const Solution& recesiveParent);
+    Solution &adjustRange(Solution& s, const std::array<std::pair<double,double>, MAX_PROBLEM_SIZE>& range);
     void sizeErrorMessage(int n);
+    void parserErrorMessage(int f);
 public:
     NSGA(QObject* parent);
     void generateRandomPopulation(const std::array<std::pair<double,double>, MAX_PROBLEM_SIZE>& range);
     void getParetoFrontCoordinates(QVector<double>& f1, QVector<double>& f2);
     std::vector<Solution> getParetoFront();
     void fastNondominatedSort();
-    void createOffspring();
+    void createOffspring(const std::array<std::pair<double,double>, MAX_PROBLEM_SIZE>& range);
     void cutUnfitHalf();
     // false - poprawna inicjalizacja, true - błąd
     bool initializeObjectiveFunctions(std::string exp1, std::string exp2);

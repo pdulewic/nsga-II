@@ -164,9 +164,25 @@ Solution NSGA::crossoverAndMutate(const Solution &dominantParent, const Solution
     return child;
 }
 
+Solution &NSGA::adjustRange(Solution &s, const std::array<std::pair<double, double>, MAX_PROBLEM_SIZE> &range){
+    for(uint i = 0; i<range.size(); ++i){
+        if(s.val[i] < range[i].first)
+            s.val[i] = range[i].first;
+        else if(s.val[i] > range[i].second)
+            s.val[i] = range[i].second;
+    }
+    return s;
+}
+
 void NSGA::sizeErrorMessage(int n){
     QMessageBox errorBox(QMessageBox::Warning, "Uwaga!", "Dla tej funkcji celu wymagany jest wymiar zadania n = "
                          + QString::number(n), 0, nullptr);
+    errorBox.exec();
+}
+
+void NSGA::parserErrorMessage(int f){
+    QMessageBox errorBox(QMessageBox::Warning, "Uwaga!", "Błąd parsera - nieprawidłowe wyrażenie f"
+                         + QString::number(f) + "(x)", 0, nullptr);
     errorBox.exec();
 }
 
@@ -244,7 +260,7 @@ void NSGA::fastNondominatedSort(){
     }
 }
 
-void NSGA::createOffspring(){
+void NSGA::createOffspring(const std::array<std::pair<double,double>, MAX_PROBLEM_SIZE>& range){
     vector<int> mates(populationSize), mates2(populationSize);
     for(int i=0; i<populationSize; ++i)
         mates[i] = mates2[i] = i;
@@ -261,8 +277,10 @@ void NSGA::createOffspring(){
         int parent1 = population[mates[i]] < population[mates[i+1]] ? mates[i] : mates[i+1];
         int parent2 = population[mates[i+2]] < population[mates[i+3]] ? mates[i+2] : mates[i+3];
         // każda para ma 2 dzieci, każde ma innego rodzica dominującego
-        offspring.push_back(crossoverAndMutate(population[parent1],population[parent2]));
-        offspring.push_back(crossoverAndMutate(population[parent2],population[parent1]));
+        Solution child1 = crossoverAndMutate(population[parent1],population[parent2]);
+        Solution child2 = crossoverAndMutate(population[parent2],population[parent1]);
+        offspring.push_back(adjustRange(child1,range));
+        offspring.push_back(adjustRange(child2,range));
     }
     // dołączenie potomstwa do populacji
     population.insert(population.end(),make_move_iterator(offspring.begin()),make_move_iterator(offspring.end()));
@@ -322,7 +340,8 @@ bool NSGA::initializeObjectiveFunctions(string exp1, string exp2){
             delete expression1;
             expression1 = new exprtk::expression<double>;
             expression1->register_symbol_table(symbolTable);
-            parser.compile(exp1,*expression1);
+            if(parser.compile(exp1,*expression1) == false)
+                parserErrorMessage(1);
             break;
         case FunctionType::ACKLEY:
         case FunctionType::GOLDSTEIN_PRICE:
@@ -340,7 +359,8 @@ bool NSGA::initializeObjectiveFunctions(string exp1, string exp2){
             delete expression2;
             expression2 = new exprtk::expression<double>;
             expression2->register_symbol_table(symbolTable);
-            parser.compile(exp2,*expression2);
+            if(parser.compile(exp2,*expression2) == false)
+                parserErrorMessage(2);
             break;
         case FunctionType::ACKLEY:
         case FunctionType::GOLDSTEIN_PRICE:
@@ -352,20 +372,6 @@ bool NSGA::initializeObjectiveFunctions(string exp1, string exp2){
         default:
             break;
         }
-
-        /*if(objType1 == FunctionType::CUSTOM){
-            delete expression1;
-            expression1 = new exprtk::expression<double>;
-            expression1->register_symbol_table(symbolTable);
-            parser.compile(exp1,*expression1);
-        }*/
-
-        /*if(objType2 == FunctionType::CUSTOM){
-            delete expression2;
-            expression2 = new exprtk::expression<double>;
-            expression2->register_symbol_table(symbolTable);
-            parser.compile(exp2,*expression2);
-        }*/
     }
     return false;
 }
