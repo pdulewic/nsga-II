@@ -57,6 +57,11 @@ void NSGA::evaluateObjectiveFunctions(Solution &s){
         switch (objType1) {
         case FunctionType::CUSTOM:
             s.objValue1 = expression1->value();
+            // dziedzina funkcji użytkownika może być mniejsza niż zakres x
+            // w takim wypadku rozwiązanie jest nieakceptowalne, ale nie można
+            // go po prostu odrzucić
+            if(isnan(s.objValue1))
+                s.objValue1 = BIG_DOUBLE;
             break;
         case FunctionType::ROSENBROCK:
             s.objValue1 = 0;
@@ -88,6 +93,8 @@ void NSGA::evaluateObjectiveFunctions(Solution &s){
         switch (objType2) {
         case FunctionType::CUSTOM:
             s.objValue2 = expression2->value();
+            if(isnan(s.objValue2))
+                s.objValue2 = BIG_DOUBLE;
             break;
         case FunctionType::ROSENBROCK:
             s.objValue2 = 0;
