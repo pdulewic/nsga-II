@@ -131,6 +131,38 @@ Powyższe rysunki przedstawiają finalne zbiory Pareto. Często algorytm osiąga
 
 Dla 9 generacji liczba rozwiązań w pierwszym froncie Pareto jest niewielka, jednak wraz z kolejnymi pokoleniami, stopniowo się ona zwiększa. W okolicach 14 generacji widoczne są już granice frontu, osiągnięte tak szybko dzięki uprzywilejowaniu skrajnych rozwiązań w algorytmie NSGA-II. Dla 27  generacji, do pierwszego frontu Pareto należy już większość populacji. Ostateczny wynik widoczny jest na rysunku \ref{fig:kursawe_200_100}, i niewiele różni się od tego, na trzeciej pozycji rysunku \ref{fig:generacje} (pomijając kwestię skali). 
 
+Przedstawione w tym rozdziale wykresy nie były selekcjonowane spośród wielu prób. Algorytm działał na tyle dobrze, że praktycznie każde jego uruchomienie zwracało dobrze rozwinięty front Pareto. 
+
+\section{Wpływ parametrów na procedurę obliczeniową}
+
+Panel kontrolny programu, widoczny na rysunku \ref{fig:program}, pozwala na ustawienie trzech parametrów algorytmu $-$ rozmiaru populacji $N$, wymiaru problemu $n$ oraz liczby generacji $L$. Zmiana wymiaru problemu (o ile jest możliwa $-$ niektóre funkcje celu wymagają konkretnych wartości $n$) modyfikuje jedynie funkcje celu, nie ma więc sensu badać wpływu $n$ na procedurę obliczeniową. Przeanalizowany został więc wpływ parametrów $N$ i $L$. Algorytm został uruchomiony dla funkcji Kursawe, z parametrami $n = 7$, $L = 500$. Przeprowadzone zostało kilka testów, dla różnych rozmiarów populacji. 
+
+Rysunek \ref{fig:kur_N_100} przedstawia zbiór Pareto dla $N = 100$. Populacja jest tutaj na tyle mała, że mimo wielu generacji, front nie został całkowicie wypełniony. Nieco lepiej wygląda sytuacja na rysunku \ref{fig:kur_N_175}. Rozwiązania układają się w pewne krzywe, jednak ich kształt jest dość nieregularny. Ostatecznie, po zwiększeniu liczby $N$ do 250, otrzymany został wykres \ref{fig:kur_N_250}. Widać tutaj bardzo dokładnie pierwszy front Pareto. Rozwiązań jest na tyle dużo, że krzywe są gęste i wyraźnie zaznaczone. 
+\begin{figure}[H]
+\centering
+\includegraphics[width=11cm]{kur_N_100}
+\caption{Funkcja Kursawe $n = 7$, rozmiar populacji 100, liczba generacji 500}
+\label{fig:kur_N_100}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=11cm]{kur_N_175}
+\caption{Funkcja Kursawe $n = 7$, rozmiar populacji 175, liczba generacji 500}
+\label{fig:kur_N_175}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=11cm]{kur_N_250}
+\caption{Funkcja Kursawe $n = 7$, rozmiar populacji 250, liczba generacji 500}
+\label{fig:kur_N_250}
+\end{figure}
+
+Powyższe rysunki wskazują na pozytywny wpływ wzrostu rozmiaru populacji na procedurę obliczeniową $-$ otrzymane wyniki są zdecydowanie lepszej jakości. Ma to jednak swoją cenę, w postaci wzrostu czasu obliczeń. 
+
+Jeśli chodzi o wpływ parametru $L$ na procedurę obliczeniową, zostało to przedstawione w poprzednim rozdziale, na rysunku \ref{fig:generacje}. Im większa liczba generacji, tym więcej czasu ma algorytm, aby ukształtować finalny front Pareto. Zazwyczaj jednak wystarczy kilkadziesiąt generacji, by wynik był zadowalający. 
+
 \section{Dyskusja błędów}
 
 Należy pamiętać, że algorytm ma charakter losowy, i nie gwarantuje, że obliczone rozwiązania będą należeć do zbioru rozwiązań optymalnych. Sam wspomniany zbiór jest z reguły nieskończony, więc jego dokładne wyznaczenie również jest bardzo trudne. Duże znaczenie dla ewentualnych błędów algorytmu, ma generacja populacji początkowej. Jest ona czysto losowa, i w niektórych przypadkach jej niefortunne wygenerowanie może sprawić, że algorytm osiągnie dużo gorsze rezultaty. Warto zatem uruchomić go wielokrotnie dla każdego problemu, i wybrać jedynie najlepsze rozwiązania. 
